@@ -67,11 +67,11 @@ const userController = {
         });
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error.message);
       res.json({
         statusCode: 500,
         message: "Internal Server Error",
-        error,
+        error: error.message,
       });
     }
   },
@@ -87,7 +87,7 @@ const userController = {
 
       //check user
       const check = await userDetails.findOne({ email: email });
-      console.log(check);
+      // console.log(check);
       // TODO : Implement only email should be unique not the user name.
       if (check)
         return res.json({
@@ -103,7 +103,7 @@ const userController = {
         });
         await newUser.save();
       } catch (error) {
-        console.log(error);
+        // console.log(error);
         res.json({
           statusCode: 400,
           message: `User Name should be unique ${error.message} `,
@@ -167,7 +167,7 @@ const userController = {
     try {
       //refresh Token
       const refresh_token = req.cookies._apprefreshtoken;
-      console.log(refresh_token);
+      // console.log(refresh_token);
 
       if (!refresh_token)
         return res.json({ statusCode: 400, message: "Please Signin" });
@@ -181,7 +181,7 @@ const userController = {
           });
         //create access token
         const access_token = createToken.access({ id: user.id }); //getting id from cookie
-        console.log(access_token);
+        // console.log(access_token);
 
         //access success
         return res.json({ statusCode: 200, message: { access_token } });
@@ -205,14 +205,14 @@ const userController = {
         return res.json({
           statusCode: 400,
           message: "Check your email",
-        }); // For security reason we should disclose user existence in DB;
+        }); // For security reason we should not disclose user existence in DB;
 
       // create access token
       const access_token = createToken.access({
         id: user.id,
         email: user.email,
       });
-      console.log(access_token);
+      // console.log(access_token);
 
       // send email
       const url = `https://password-resetting.netlify.app/reset_password/${access_token}`;
@@ -238,8 +238,6 @@ const userController = {
       // get token from headers
       let access_token = req.headers.authorization;
       //console.log(req.headers.authorization);
-      // TODO : If access token Expired then alert the user.
-      // get password from body.
       const { password } = req.body;
 
       // hash password
@@ -247,7 +245,7 @@ const userController = {
       const hashPassword = await bcrypt.hash(password, salt);
 
       //get user from db
-      console.log(req.user);
+      // console.log(req.user);
       const dbUser = await userDetails.findOne({ _id: req.user.id }); // Retrieving user.id from auth middleware.
 
       // compare new pw and db pw
@@ -257,7 +255,6 @@ const userController = {
         if (password === "") {
           res.json({ statusCode: 400, message: "Password Required" });
         }
-
         if (password.length < 8) {
           return res.json({
             statusCode: 400,
@@ -289,7 +286,7 @@ const userController = {
         });
       }
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       res.json({
         statusCode: 500,
         message: error.message,
